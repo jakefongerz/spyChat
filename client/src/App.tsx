@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import { socket } from './socket'
 import CryptoJS from "crypto-js";
+import { ToastContainer, toast } from 'react-toastify';
+
+
 
 // Encrypts a message using AES encryption
 function encryptMessage(message: string, key: string): string {
@@ -16,39 +19,46 @@ function decryptMessage(encryptedMessage: string, key: string): string {
 
 
 function App() {
+  const notify = () => toast("Incorrect key!");
   const [message, setMessage] = useState("");
   const [secretKey, setSecretKey] = useState("");
-  const [messageRecieved, setMessageRecieved] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messageRecieved, setMessageRecieved] = useState({message: String, secretKey: String});
+  const [messages, setMessages] = useState<{ message: string; secretKey: string }[]>([]);
   const [decodedMessages, setDecodedMessages] = useState<string[]>([]);
-
   const [connected, setConnected] = useState(socket.connected);
+  
+
+
+
 
 const displayMessages = () => { 
-  return messages.map((message, index) => {
+  return messages.map((data, index) => {
     return <div key={index} className='msg'>
       <button onClick={() => {
         const passcode = prompt("Enter the key to decrypt the message:")  as string;
-        if (passcode == secretKey) {
-          const decryptedMessage = decryptMessage(message, passcode);
-          setMessages(messages.filter((_, i) => i !== index));
+        if (passcode == data.secretKey) {
+          const decryptedMessage = decryptMessage(data.message, data.secretKey);
           setDecodedMessages([...decodedMessages, decryptedMessage]);
+          setMessages(messages.filter((_, msgIndex) => msgIndex !== index));
+
         }
         else {
-          // TODO: Create toeast notification
-          alert("Invalid key");
-          console.log("passcode" + passcode + "secretKey" + secretKey); 
+          
+          //alert("Invalid key");
+          console.log("passcode: \'" + passcode + "\' secretKey: \'" + data.secretKey + "\'")
+          notify();
         }
-      }}>{message}</button>
+      }}>{data.message}</button>
     </div>
 
   });
 }
 
+
 const displayDecodedMessages = () => { 
-  return decodedMessages.map((message, index) => {
+  return decodedMessages.map((msg, index) => {
     return <div key={index}className='msg'>
-      {message}
+      {msg}
     </div>
   }
   );
@@ -56,7 +66,9 @@ const displayDecodedMessages = () => {
 
 const sendMessage = () => {
   const encryptedMessage = encryptMessage(message, secretKey); 
-  socket.emit('send_message', { message: encryptedMessage });
+  socket.emit('send_message', { message: encryptedMessage, secretKey: secretKey });
+  setMessage('');
+  setSecretKey('');
 }
 
   useEffect(() => {
@@ -68,14 +80,19 @@ const sendMessage = () => {
 
 
     socket.on('recieve_message', (data) => {
-      messages.push(data.message);
-      setMessageRecieved(data.message);});
-      console.log(messages);
+      setMessages((prevMessages) => [...prevMessages, data]);
+      setMessageRecieved(data);
+    });
 
+    socket.on('disconnect', () => {
+      setConnected(false);
+    });
 
     return () => {
-      socket.disconnect();
       socket.off('connect');
+      socket.off('recieve_message');
+      socket.off('disconnect');
+      socket.disconnect();
     }
   }, []);
 
@@ -85,11 +102,19 @@ const sendMessage = () => {
       <div className="card">
       
         <div>
-        <input type="text" placeholder='Message...'
+        <input 
+        name="input_message" 
+        type="text" 
+        placeholder='Message...' 
+        value={message}
         onChange={(event) => {
           setMessage(event.target.value);
         }} />
-        <input type="text" placeholder='Secret Key...'        
+        <input 
+        name="input_key" 
+        type="text" 
+        placeholder='Secret Key...'
+        value={secretKey}       
         onChange={(event) => {
           setSecretKey(event.target.value);
         }} />
@@ -101,6 +126,7 @@ const sendMessage = () => {
         </div>
         <div>
           <h2>Encrypted Messages</h2>
+          <ToastContainer aria-label="toast notifications"/>
           {displayMessages()}
           </div>
       </div>
