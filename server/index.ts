@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
         <meta charset="UTF-8" />
         <link rel="icon" type="image/svg+xml" href="${process.env.ASSET_URL}/vite.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>React-Express Starter App</title>
+        <title>Spy Chat :D</title>
         <script type="module">
           import RefreshRuntime from '${process.env.ASSET_URL}/@react-refresh'
           RefreshRuntime.injectIntoGlobalHook(window)
@@ -59,13 +59,14 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('a user connected');
-  socket.on('count', () => {
-    console.log('count event received');
-    io.emit('count');
-  });
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
+  // Recieves message from client and returns to all clients
+  socket.on('send_message', (data) => {
+    console.log('Sent Message:'  + data.message);
+    io.emit('recieve_message', data);
+});
 });
 
 server.listen(port, () => {
