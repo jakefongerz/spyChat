@@ -1,8 +1,21 @@
-# CS 4610 Express React Starter App
-This simple application just gives a basic React+Vite/Express setup. It is meant to be a starting point for simple projects but is lacking many features that a full-fledged application would have.
-In the future you will be given a more complete application to work with.
+# Spy Chat 🔐💬
 
-## Getting Started
+Spy Chat is a real-time encrypted messaging application built using **Socket.IO, React, Express, and TypeScript**. Messages are encrypted with a passphrase before being sent, and recipients must enter the correct passphrase to decrypt and read them. Without the correct passphrase, messages remain unreadable!
+
+## 📌 Features
+- 🔗 **Real-time messaging** using WebSockets (Socket.IO)
+- 🔐 **End-to-end encryption** with user-supplied passphrases
+- 🎨 **Neatly styled UI** for a smooth user experience
+- 🚀 **Single-page application** hosted by the Express backend
+- 🔑 **Decryption on click** – enter the passphrase to decode a message
+- ⚡ **Built with TypeScript** for type safety and scalability
+
+## 🛠️ Tech Stack
+- **Frontend:** React, TypeScript
+- **Backend:** Express, Socket.IO
+- **Encryption:** Any symmetric encryption algorithm (e.g., CryptoJS)
+
+## 🚀 Getting Started
 1. Fork/Clone this repository
 2. Run `npm install` in the server directory
 3. Run `npm install` in the client directory
@@ -11,5 +24,3 @@ In the future you will be given a more complete application to work with.
 6. Run `npm run dev` in the client directory
 7. Open your browser to `http://localhost:3000`
 Make sure are running the server and client in separate terminals.
-
-Happy coding!
