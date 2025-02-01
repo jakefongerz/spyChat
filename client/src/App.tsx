@@ -34,17 +34,15 @@ function App() {
 const displayMessages = () => { 
   return messages.map((data, index) => {
     return <div key={index} className='msg'>
-      <button onClick={() => {
+      <button 
+      onClick={() => {
         const passcode = prompt("Enter the key to decrypt the message:")  as string;
         if (passcode == data.secretKey) {
           const decryptedMessage = decryptMessage(data.message, data.secretKey);
           setDecodedMessages([...decodedMessages, decryptedMessage]);
-          setMessages(messages.filter((_, msgIndex) => msgIndex !== index));
-
+          setMessages(messages.filter((_, msgIndex) => msgIndex !== index)); // remove the message from the list
         }
         else {
-          
-          //alert("Invalid key");
           console.log("passcode: \'" + passcode + "\' secretKey: \'" + data.secretKey + "\'")
           notify();
         }
@@ -57,7 +55,7 @@ const displayMessages = () => {
 
 const displayDecodedMessages = () => { 
   return decodedMessages.map((msg, index) => {
-    return <div key={index}className='msg'>
+    return <div key={index} className='msg'>
       {msg}
     </div>
   }
